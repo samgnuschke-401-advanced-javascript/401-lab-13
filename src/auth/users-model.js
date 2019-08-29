@@ -61,4 +61,31 @@ users.methods.generateToken = function() {
   return jwt.sign(token, process.env.SECRET);
 };
 
+// -----------------------------------------------------
+
+users.statics.authenticateToken = function(token) {
+  if(process.env.REMEMBER === 'yes'){
+    const decryptedToken = jwt.verify(token, process.env.SECRET || 'secret');
+    const query = {_id:decryptedToken.id};
+    return this.findOne(query);
+  }else {
+    if(previousTokens.includes(token)){
+      throw new Error('invalid')
+    }
+  }
+}
+
+// -----------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------------
+users.statics.generateTimedToken = function (){
+  let token = {
+    id: this._id,
+    role: this.role,
+  }
+  return jwt.sign(token, process.env.SECRET || 'secret', {expiresIn: 1 0});
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+
 module.exports = mongoose.model('users', users);
