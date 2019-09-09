@@ -26,7 +26,12 @@ app.use(authRouter);
 // Catchalls
 app.use(notFound);
 app.use(errorHandler);
+/**
+ * @param  {} port
+ * @param  {} =>{app.listen(port
+ * @param  {} =>{console.log(`ServerUpon${port}`
 
+ */
 module.exports = {
   server: app,
   start: (port) => {

@@ -50,7 +50,13 @@ users.methods.comparePassword = function(password) {
   return bcrypt.compare( password, this.password )
     .then( valid => valid ? this : null);
 };
-
+/**
+ * Generates token after signin
+ * @param  {this._id} {lettoken={id
+ * @param  {this.role} role
+ * @param  {} };returnjwt.sign(token
+ * @param  {} process.env.SECRET
+ */
 users.methods.generateToken = function() {
   
   let token = {
@@ -60,5 +66,47 @@ users.methods.generateToken = function() {
   
   return jwt.sign(token, process.env.SECRET);
 };
+
+// -----------------------------------------------------
+/**
+ * Verifies provided token
+ * @param  {} token
+ * @param  {} {if(process.env.REMEMBER==='yes'
+ * @param  {} {constdecryptedToken=jwt.verify(token
+ * @param  {} process.env.SECRET||'secret'
+ * @param  {decryptedToken.id};returnthis.findOne(query} ;constquery={_id
+ */
+users.statics.authenticateToken = function(token) {
+  if(process.env.REMEMBER === 'yes'){
+    const decryptedToken = jwt.verify(token, process.env.SECRET || 'secret');
+    const query = {_id:decryptedToken.id};
+    return this.findOne(query);
+  }else {
+    if(previousTokens.includes(token)){
+      throw new Error('invalid')
+    }
+  }
+}
+
+// -----------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------------
+/**
+ * This genetares a token that expires in 10 minutes
+ * @param  {this._id} {lettoken={id
+ * @param  {this.role} role
+ * @param  {} }returnjwt.sign(token
+ * @param  {} process.env.SECRET||'secret'
+ * @param  {10}} {expiresIn
+ */
+users.statics.generateTimedToken = function (){
+  let token = {
+    id: this._id,
+    role: this.role,
+  }
+  return jwt.sign(token, process.env.SECRET || 'secret', {expiresIn: 10});
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
 
 module.exports = mongoose.model('users', users);
